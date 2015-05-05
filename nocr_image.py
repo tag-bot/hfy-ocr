@@ -2,6 +2,7 @@ import requests
 import json
 import sys
 from os import path
+from time import sleep
 
 KEY='1f90833f0cd9d3403c32fff56dc7e4ba'
 
@@ -14,11 +15,19 @@ def upload_image(fpath):
         file_id = content['data']['file_id']
         pages = content['data']['pages']
 
+        sleep(10)
         return (file_id, pages)
 
     print 'Unable to upload image', result.status_code, result.content
     sys.exit()
 
+def download_image(url):
+    result = requests.get(url)
+    if result == 200:
+        with open('/tmp/%s' % path.basename(url), 'wb') as f:
+            f.write(result.content)
+
+    else: print 'Unable to download %s' % url
 
 def ocr_image(fpath):
     file_id, pages = upload_image(fpath)
@@ -30,7 +39,7 @@ def ocr_image(fpath):
             content = json.loads(result.content)
             text = content['data']['text']
             
-            print text.encode('utf-8')
+            return text.encode('utf-8')
 
     print 'Unable to OCR image', result.status_code, result.content
 
@@ -49,10 +58,6 @@ def format_for_reddit(text):
 
     return '\n'.join(ret)
 
-#ocr_image('/tmp/test.jpg')
-
-f = open('/tmp/a.txt', 'r')
-txt = f.read()
-f.close()
-
-print format_for_reddit(txt)
+txt = ocr_image('/tmp/b.png')
+print txt
+#print format_for_reddit(txt)
