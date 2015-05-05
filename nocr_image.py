@@ -21,13 +21,19 @@ def upload_image(fpath):
     print 'Unable to upload image', result.status_code, result.content
     sys.exit()
 
-def download_image(url):
+def ocr_url(url):
     result = requests.get(url)
-    if result == 200:
-        with open('/tmp/%s' % path.basename(url), 'wb') as f:
+    if result.status_code == 200:
+        filename = '/tmp/%s' % path.basename(url)
+        with open(filename, 'wb') as f:
             f.write(result.content)
 
-    else: print 'Unable to download %s' % url
+        print filename
+        return ocr_image(filename)
+        
+    else: 
+        print 'Unable to download %s' % url
+        print result.status_code, result.content
 
 def ocr_image(fpath):
     file_id, pages = upload_image(fpath)
@@ -58,6 +64,12 @@ def format_for_reddit(text):
 
     return '\n'.join(ret)
 
-txt = ocr_image('/tmp/b.png')
-print txt
-#print format_for_reddit(txt)
+def main():
+    from sys import argv
+
+    txt = ocr_url(argv[1])
+    print format_for_reddit(txt)
+
+
+if __name__ == '__main__':
+    main()
