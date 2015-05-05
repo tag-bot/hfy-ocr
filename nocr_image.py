@@ -55,7 +55,7 @@ def format_for_reddit(text):
     ret = []
 
     for line in lines:
-        if line.startswith('>>') or line.startswith('Anonymous'):
+        if line.startswith('>>') or line.startswith('Anonymous') or line.startswith('File:'):
             continue
         if line == '':
             ret += ['']
